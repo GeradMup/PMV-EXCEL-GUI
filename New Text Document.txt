@@ -1,0 +1,70 @@
+Private Sub Worksheet_Change(ByVal Target As Range)
+    Application.ScreenUpdating = False
+    'Check first if the user has entered a valid parameter or not
+    Dim error As Boolean
+    error = Sheets("Editing Page").Range("O6").Value
+    
+    If error = True Then
+    
+        Exit Sub
+    Else
+        
+    End If
+    
+    
+    'This function wraps the cell contents to fit within the drawing office and engineering notes fields
+    If Target.Address = "$B$5" Then
+        Dim currentCellRef As String
+        'The address of the cell that contains a 1
+        currentCellRef = Sheets("Editing Page").Range("O7").Value
+        
+        
+        'Select the value to be edited and change the colour of the cell to green
+        'Also call the scroll function so that we can have our current parameter in view
+        ActiveWindow.ScrollRow = Sheets("Editing Page").Range("P6").Value - 1
+        Sheets("Editing Page").Range("N7").Value = Sheets("Editing Page").Range(currentCellRef).Offset(0, -15).Address
+        Sheets("Editing Page").Range(currentCellRef).Offset(0, -15).Interior.Color = RGB(0, 255, 0)
+        
+        'Copy the current parameter value into B6
+        Sheets("Editing Page").Range("B6").Value = Sheets("Editing Page").Range(currentCellRef).Offset(0, -15)
+        
+        'Change the active cell to the main command cell
+        'Sheets("Editing Page").Range("B6").Select
+        
+    ElseIf Target.Address = "$B$6" Then
+        Sheets("Editing Page").Range("B5").Select
+    End If
+    Application.ScreenUpdating = True
+End Sub
+
+'Triggers whenever any selection change occurs in the workbook
+Private Sub Worksheet_SelectionChange(ByVal Target As Range)
+    Application.ScreenUpdating = False
+    Dim currentCellRef As String
+    
+    currentCellRef = Sheets("Editing Page").Range("N7").Value
+    
+    'If the active cell changes to B7, put it back to B5
+    'Clear inputs all inputs and get ready for the next one
+    If ActiveCell.Address = "$B$7" Then
+        'Sheets("Editing Page").Range("B5").Select
+        Sheets("Editing Page").Range(currentCellRef).Interior.Color = RGB(255, 204, 102)
+        
+        'Read the previous parameter row and scroll on to the next row
+        'We will do this by copying the next parameter name into B5
+        
+        Dim nextParameter As String
+        nextParameter = Sheets("Editing Page").Range(currentCellRef).Offset(1, -1).Value
+        nextParameter = Left(nextParameter, Len(nextParameter) - 3)
+        Sheets("Editing Page").Range("B5").Value = nextParameter
+    End If
+    
+    'Let's also make sure that no other cells are allowed to be active except those two that we use for editing
+    If ActiveCell.Address <> "$B$5" Then
+        If ActiveCell.Address <> "$B$6" Then
+            'Sheets("Editing Page").Range("B5").Select
+        End If
+    End If
+    Application.ScreenUpdating = True
+
+End Sub
